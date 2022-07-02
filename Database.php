@@ -57,18 +57,35 @@ class Database
         return $this->action('DELETE', $table, $where);
     }
 
-    public function insert($table, $data)
+    public function insert($table, $fields)
     {
         $stringValues = '';
-        foreach ($data as $datum) {
+        foreach ($fields as $field) {
             $stringValues .= '?,';
         }
 
         $stringValues = rtrim($stringValues, ',');
 
-        $sql = "INSERT INTO {$table} (`" . implode('`,`', array_keys($data)) . "`) VALUES ({$stringValues})";
+        $sql = "INSERT INTO {$table} (`" . implode('`,`', array_keys($fields)) . "`) VALUES ({$stringValues})";
 
-        if (!$this->query($sql, $data)->error()) {
+        if (!$this->query($sql, $fields)->error()) {
+            return $this;
+        }
+
+        return false;
+    }
+
+    public function update($table, $id, $fields)
+    {
+        $set = '';
+        foreach ($fields as $key => $field) {
+            $set .= "$key=?,";
+        }
+        $set = rtrim($set, ",");
+
+        $sql = "UPDATE {$table} SET {$set} WHERE id = {$id}";
+
+        if (!$this->query($sql, $fields)->error()) {
             return $this;
         }
 
@@ -108,6 +125,11 @@ class Database
     public function results()
     {
         return $this->results;
+    }
+
+    public function first()
+    {
+        return $this->results()[0];
     }
 
 }

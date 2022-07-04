@@ -6,6 +6,7 @@ require_once "Input.php";
 require_once "Validate.php";
 require_once "Session.php";
 require_once "Token.php";
+require_once "User.php";
 
 $GLOBALS['config'] = [
     'mysql' => [
@@ -41,12 +42,20 @@ if (Input::exists()) {
         ]);
 
         if ($validate->passed()) {
-            Session::flash('success', 'Данные успешно отправлены');
+            $user = new User();
+            $answer = $user->create([
+                'name' => Input::get('name'),
+                'password' => password_hash(Input::get('password'), PASSWORD_DEFAULT),
+            ]);
+            ($answer
+                ? Session::flash('success', 'Пользователь успешно создан')
+                : Session::flash('error', 'Ошибка добавления пользователя'));
+
         } else {
-            echo 'Не ну это бан';
+            echo '<pre>';
+            print_r($validate->getError());
+            echo '</pre>';
         }
-    } else {
-        echo "Нет токена";
     }
 }
 
@@ -68,7 +77,7 @@ if (Input::exists()) {
 //}
 ?>
 <div>
-    <p><?php echo Session::flash('success');; ?></p>
+    <p><?php echo Session::flash('success'); ?></p>
 </div>
 <form action="index.php" method="post">
     <label for="username">Имя</label>

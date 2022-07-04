@@ -1,8 +1,11 @@
 <?php
+session_start();
 require_once "Database.php";
 require_once "Config.php";
 require_once "Input.php";
 require_once "Validate.php";
+require_once "Session.php";
+require_once "Token.php";
 
 $GLOBALS['config'] = [
     'mysql' => [
@@ -10,37 +13,40 @@ $GLOBALS['config'] = [
         'username' => 'root',
         'password' => '',
         'database' => 'comppractice'
+    ],
+    'session' => [
+        'token_name' => 'token',
     ]
 ];
 
 if (Input::exists()) {
-    $validate = new Validate();
+    if (Token::check(Input::get('token'))) {
+        $validate = new Validate();
 
-    $validator = $validate->check($_POST, [
-        'name' => [
-            'required' => true,
-            'min' => 10,
-            'max' => 15,
-            'uniq' => 'users'
-        ],
-        'password' => [
-            'required' => true,
-            'min' => 4,
-        ],
-        'password_again' => [
-            'required' => true,
-            'matches' => 'password'
-        ],
-    ]);
+        $validator = $validate->check($_POST, [
+            'name' => [
+                'required' => true,
+                'min' => 4,
+                'max' => 15,
+                'uniq' => 'users'
+            ],
+            'password' => [
+                'required' => true,
+                'min' => 4,
+            ],
+            'password_again' => [
+                'required' => true,
+                'matches' => 'password'
+            ],
+        ]);
 
-    echo '<pre>';
-    print_r($validate->getError());
-    echo '</pre>';
-
-    if ($validate->passed()) {
-        echo 'Всё успешно';
+        if ($validate->passed()) {
+            Session::flash('success', 'Данные успешно отправлены');
+        } else {
+            echo 'Не ну это бан';
+        }
     } else {
-        echo 'Не ну это бан';
+        echo "Нет токена";
     }
 }
 
@@ -61,6 +67,9 @@ if (Input::exists()) {
 //    echo '</pre>';
 //}
 ?>
+<div>
+    <p><?php echo Session::flash('success');; ?></p>
+</div>
 <form action="index.php" method="post">
     <label for="username">Имя</label>
     <input type="text" name="name" id="username" value="<?php echo Input::get('name'); ?>">
@@ -68,5 +77,6 @@ if (Input::exists()) {
     <input type="text" name="password" id="password">
     <label for="password_again">Повторение пароля</label>
     <input type="text" name="password_again" id="password_again">
+    <input type="hidden" name="token" value="<?php echo Token::generate(); ?>">
     <button type="submit">Отправить</button>
 </form>

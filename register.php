@@ -10,6 +10,10 @@ if (Input::exists()) {
                 'required' => true,
                 'min' => 4,
                 'max' => 15,
+            ],
+            'email' => [
+                'required' => true,
+                'email' => true,
                 'uniq' => 'users'
             ],
             'password' => [
@@ -26,6 +30,7 @@ if (Input::exists()) {
             $user = new User();
             $answer = $user->create([
                 'name' => Input::get('name'),
+                'email' => Input::get('email'),
                 'password' => password_hash(Input::get('password'), PASSWORD_DEFAULT),
             ]);
             ($answer
@@ -43,10 +48,13 @@ if (Input::exists()) {
 ?>
 <div>
     <p><?php echo Session::flash('success'); ?></p>
+    <p><?php echo Session::flash('error'); ?></p>
 </div>
 <form action="register.php" method="post">
     <label for="username">Имя</label>
     <input type="text" name="name" id="username" value="<?php echo Input::get('name'); ?>">
+    <label for="email">Почта</label>
+    <input type="email" name="email" id="email" value="<?php echo Input::get('email'); ?>">
     <label for="password">Пароль</label>
     <input type="text" name="password" id="password">
     <label for="password_again">Повторение пароля</label>

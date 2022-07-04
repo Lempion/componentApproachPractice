@@ -36,6 +36,11 @@ class Validate
                                 $this->addError("Password  not equal password again");
                             }
                             break;
+                        case 'email':
+                            if (!filter_var($valueInput, FILTER_VALIDATE_EMAIL)) {
+                                $this->addError("{$valueInput} is not an email");
+                            }
+                            break;
                         case "uniq":
                             if ($this->db->get($valRule, [$field, '=', $valueInput])->count()) {
                                 $this->addError("This {$field} is exists");

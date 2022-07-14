@@ -30,6 +30,15 @@ class User
         return $this->db->insert('users', $fields);
     }
 
+    public function update($fields, $id = null)
+    {
+        if (!$id && $this->isLoggedIn()) {
+            $id = $this->data()->id;
+        }
+
+        $this->db->update('users', $id, $fields);
+    }
+
     public function login($email = null, $password = null, $remember = false)
     {
         if (!$email && !$password && $this->exists()) {

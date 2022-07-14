@@ -18,9 +18,12 @@ if (Input::exists()) {
         if ($validate->passed()) {
             $user = new User();
             $answer = $user->login(Input::get('email'),Input::get('password'));
-            ($answer
-                ? Session::flash('success', 'Пользователь успешно авторизован')
-                : Session::flash('error', 'Ошибка авторизации пользователя'));
+            if($answer){
+                Session::flash('success', 'Пользователь успешно авторизован');
+                Redirect::to('/');
+            }else{
+                Session::flash('error', 'Ошибка авторизации пользователя');
+            }
 
         } else {
             echo '<pre>';

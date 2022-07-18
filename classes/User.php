@@ -85,6 +85,23 @@ class User
         Cookie::delete($this->cookie_name);
     }
 
+    public function hasPermission($key)
+    {
+
+        $group = $this->db->get('groupsPermissions', ['id', '=', $this->data()->group_id]);
+
+        if ($group->count()) {
+            
+            $permissions = json_decode($group->first()->permissions, true);
+
+            if ($permissions[$key]) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function exists()
     {
         return (!empty($this->data()) ? true : false);

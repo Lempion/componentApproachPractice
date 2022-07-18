@@ -9,7 +9,7 @@ class Database
     private function __construct()
     {
         try {
-            $this->pdo = new PDO("mysql:host=" . Config::get('mysql.host') .";dbname=" . Config::get('mysql.database'), Config::get('mysql.username'), Config::get('mysql.password'));
+            $this->pdo = new PDO("mysql:host=" . Config::get('mysql.host') . ";dbname=" . Config::get('mysql.database'), Config::get('mysql.username'), Config::get('mysql.password'));
         } catch (PDOException $exception) {
             die($exception->getMessage());
         }
@@ -28,6 +28,7 @@ class Database
         $this->error = false;
         $this->query = $this->pdo->prepare($sql);
 
+
         if (count($params)) {
             $i = 1;
             foreach ($params as $param) {
@@ -38,6 +39,7 @@ class Database
 
         if (!$this->query->execute()) {
             $this->error = true;
+
         } else {
             $this->results = $this->query->fetchAll(PDO::FETCH_OBJ);
 
@@ -103,6 +105,7 @@ class Database
 
             if (in_array($operator, $operators)) {
                 $sql = "{$action} FROM {$table} WHERE {$filed} {$operator} ?";
+
 
                 if (!$this->query($sql, array($value))->error()) {
                     return $this;
